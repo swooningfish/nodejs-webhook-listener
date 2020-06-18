@@ -2,6 +2,9 @@
 const express = require("express")
 const bodyParser = require("body-parser")
 require('dotenv').config();
+const { exec } = require("child_process");
+
+
 
 // Initialize express and define a port
 const app = express()
@@ -27,6 +30,48 @@ app.get('/', (req, res) => {
     return res.end('Webhook Example');
     //return res.end(req.query.challenge);
 });
+
+app.get('/unblock', (req, res) => {
+    // check if verification token is correct
+    if (req.query.token !== token) {
+        return res.sendStatus(401);
+    }
+
+	exec("./commands/unblockdomains.sh", (error, stdout, stderr) => {
+		if (error) {
+			console.log(`error: ${error.message}`);
+			return;
+		}
+		if (stderr) {
+			console.log(`stderr: ${stderr}`);
+			return;
+		}
+		console.log(`stdout: ${stdout}`);
+		return res.end(stdout);
+	});
+});
+
+app.get('/block', (req, res) => {
+    // check if verification token is correct
+    if (req.query.token !== token) {
+        return res.sendStatus(401);
+    }
+
+	exec("./commands/blockdomains.sh", (error, stdout, stderr) => {
+		if (error) {
+			console.log(`error: ${error.message}`);
+			return;
+		}
+		if (stderr) {
+			console.log(`stderr: ${stderr}`);
+			return;
+		}
+		console.log(`stdout: ${stdout}`);
+		return res.end(stdout);
+	});
+});
+
+
 
 app.get('/test', (req, res) => {
     // check if verification token is correct
